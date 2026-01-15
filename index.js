@@ -21,6 +21,8 @@ const PORT = 5000;
 // }
 // });
 
+app.use(express.json());
+
 
 const todoSchema = new mongoose.Schema({
     title : String,
