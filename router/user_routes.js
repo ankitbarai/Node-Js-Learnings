@@ -4,5 +4,7 @@ const appRouter = express.Router();
 
 //authentication
 appRouter.post('/user-registration',userController.userRegister);
+appRouter.post('/verify-otp',userController.verifyOtp);
+
 
 module.exports = {appRouter};

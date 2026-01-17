@@ -1,4 +1,5 @@
-const userModel = require('../models/user_models')
+const userModel = require('../models/user_models');
+const verifyOtpModel = require('../models/verify_otp_model');
 // user regisstration
 
 const userRegister = async (req, res) => {
@@ -17,6 +18,19 @@ const userRegister = async (req, res) => {
 
         let randomOTP = Math.floor(Math.random() * 1000) + 1000;
         console.log("OTP is", randomOTP);
+
+        let expiryTime = new Date();
+        expiryTime.setMinutes(expiryTime.getMinutes()+3);
+
+        let otpLog = await verifyOtpModel.findOne({email});
+
+        if (otpLog) {
+            await verifyOtpModel.updateOne({email}, {otp:randomOTP,expiresAt:expiryTime});
+        }else{
+            const otp = new verifyOtpModel({email,otp:randomOTP,expiresAt:expiryTime});
+            await otp.save()
+        }
+
         return res.statuscode(200).send({ success: true, message: "User registered Successfully",data:{yourOTP:randomOTP} });
 
     } catch (err) {
@@ -24,4 +38,34 @@ const userRegister = async (req, res) => {
     }
 }
 
-module.exports = { userRegister };
+//verify otp
+
+const verifyOtp = async (req,res)=>{
+    const { name, email, password } = req.body;
+
+    try {
+
+         if (!(name && email && password)) {
+            return res.statuscode(400).send({ success: false, message: "Name,email and password are required" });
+        }
+
+        let user = await verifyOtpModel.find({email});
+        if(user?.expiresAt < new Date()){
+            return res.statuscode(400).send({success:false,message:"OTP has expired"})
+        }
+
+        if(user?.otp == otp){
+            const users = new userModel({name,email,password});
+            await users?.save();
+            return res.statuscode(201).send({success :true, message:"Registered Successfully"});
+        }else{
+            return res.statuscode(500).send({success :false, message:"Invalid OTP"});
+        }
+        
+    } catch (err) {
+        return res.statuscode(500).send({success :false, message:"Server error"});
+    }
+
+}
+
+module.exports = { userRegister,verifyOtp };
