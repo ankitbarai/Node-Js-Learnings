@@ -2,8 +2,9 @@ const { generateToken } = require('../middleware/authentication');
 const userModel = require('../models/user_models');
 const verifyOtpModel = require('../models/verify_otp_model');
 const {generateToken} = require('../middleware/authentication');
-// user regisstration
 
+
+// user regisstration
 const userRegister = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -41,7 +42,6 @@ const userRegister = async (req, res) => {
 }
 
 //verify otp
-
 const verifyOtp = async (req,res)=>{
     const { name, email, password } = req.body;
 
@@ -77,4 +77,13 @@ const verifyOtp = async (req,res)=>{
 
 }
 
-module.exports = { userRegister,verifyOtp };
+const getUserDetails = async(req,res)=>{
+    try {
+        const user = await userModel.findById({_id: req.user['id']});
+        return res.status(200).send({success:true, message:"User Details",data:user});
+    } catch (err) {
+        return res.status(500).send({success:false, message:"Server error"});
+    }    
+}
+
+module.exports = { userRegister,verifyOtp,getUserDetails };
