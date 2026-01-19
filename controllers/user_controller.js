@@ -1,5 +1,7 @@
+const { generateToken } = require('../middleware/authentication');
 const userModel = require('../models/user_models');
 const verifyOtpModel = require('../models/verify_otp_model');
+const {generateToken} = require('../middleware/authentication');
 // user regisstration
 
 const userRegister = async (req, res) => {
@@ -57,7 +59,14 @@ const verifyOtp = async (req,res)=>{
         if(user?.otp == otp){
             const users = new userModel({name,email,password});
             await users?.save();
-            return res.statuscode(201).send({success :true, message:"Registered Successfully"});
+
+            let user = userModel.findOne({email:email});
+            let token = generateToken(user.id, user.email);
+            let userData = user.toObject();
+            userData['token'] = token;
+
+
+            return res.statuscode(201).send({success :true, message:"Registered Successfully", data:userData});
         }else{
             return res.statuscode(500).send({success :false, message:"Invalid OTP"});
         }
