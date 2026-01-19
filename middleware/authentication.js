@@ -1,6 +1,7 @@
 const jwt =require('jsonwebtoken');
+require('dotenv').config();
 
-const secretKey = "ankitlearningnodejs"
+const secretKey = process.env.SECRET_KEY;
 
 function generateToken(userId,email) {
     return jwt.sign({id:userId,email:email},secretKey)
