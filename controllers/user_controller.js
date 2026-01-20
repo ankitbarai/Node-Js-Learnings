@@ -77,6 +77,8 @@ const verifyOtp = async (req,res)=>{
 
 }
 
+
+//get user details
 const getUserDetails = async(req,res)=>{
     try {
         const user = await userModel.findById({_id: req.user['id']});
@@ -85,5 +87,7 @@ const getUserDetails = async(req,res)=>{
         return res.status(500).send({success:false, message:"Server error"});
     }    
 }
+
+
 
 module.exports = { userRegister,verifyOtp,getUserDetails };
