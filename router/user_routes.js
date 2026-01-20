@@ -7,6 +7,7 @@ const appRouter = express.Router();
 appRouter.post('/user-registration',userController.userRegister);
 appRouter.post('/verify-otp',userController.verifyOtp);
 appRouter.post('/user-login',userController.userLogin);
+appRouter.post('/forgot-password',userController.forgotPassword);
 
 //users
 

@@ -1,6 +1,7 @@
 const { generateToken } = require('../middleware/authentication');
 const userModel = require('../models/user_models');
 const verifyOtpModel = require('../models/verify_otp_model');
+const forgotPasswordOtpModel = require('../models/forgot_password_model');
 const {generateToken} = require('../middleware/authentication');
 
 
@@ -114,10 +115,46 @@ const userLogin = async(req,res)=>{
     }    
 }
 
+//forgot password
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
 
+    try {
+        if (!(email)) {
+            return res.statuscode(400).send({ success: false, message: "Email is required" });
+        }
+
+        let user = userModel.findOne({email:email});
+        if (!user) {
+            return res.statuscode(400).send({ success: false, message: "Invalid email" });
+        }
+
+        let randomOTP = Math.floor(Math.random() * 1000) + 1000;
+        console.log("OTP is", randomOTP);
+
+        let expiryTime = new Date();
+        expiryTime.setMinutes(expiryTime.getMinutes()+3);
+
+        let otpLog = await forgotPasswordOtpModel.findOne({email});
+
+        if (otpLog) {
+            await forgotPasswordOtpModel.updateOne({email}, {otp:randomOTP,expiresAt:expiryTime});
+        }else{
+            const otp = new forgotPasswordOtpModel({email,otp:randomOTP,expiresAt:expiryTime});
+            await otp.save()
+        }
+
+        return res.statuscode(200).send({ success: true, message: "User registered Successfully",data:{yourOTP:randomOTP} });
+
+    } catch (err) {
+        return res.statuscode(500).send({ success: false, message: "Internal Server error" });
+    }
+}
 
 module.exports = { 
     userRegister,
     verifyOtp,
     getUserDetails,
-    userLogin };
+    userLogin,
+    forgotPassword
+ };
