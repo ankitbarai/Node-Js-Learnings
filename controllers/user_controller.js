@@ -43,7 +43,7 @@ const userRegister = async (req, res) => {
 
 //verify otp
 const verifyOtp = async (req,res)=>{
-    const { name, email, password } = req.body;
+    const { name, email, password,otp } = req.body;
 
     try {
 
