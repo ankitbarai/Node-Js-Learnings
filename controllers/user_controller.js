@@ -5,7 +5,7 @@ const forgotPasswordOtpModel = require('../models/forgot_password_model');
 const {generateToken} = require('../middleware/authentication');
 
 
-// user regisstration
+// user registration
 const userRegister = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -151,10 +151,39 @@ const forgotPassword = async (req, res) => {
     }
 }
 
+
+//verify forgot password otp
+const verifyForgotPasswordOTP = async (req,res)=>{
+    const { email,otp } = req.body;
+
+    try {
+
+         if (!(email && otp)) {
+            return res.statuscode(400).send({ success: false, message: "email and otp are required" });
+        }
+
+        let user = await forgotPasswordOtpModel.find({email});
+        if(user?.expiresAt < new Date()){
+            return res.statuscode(400).send({success:false,message:"OTP has expired"})
+        }
+
+        if(user?.otp == otp){
+            return res.statuscode(201).send({success :true, message:"OTP Verified Successfully"});
+        }else{
+            return res.statuscode(400).send({success :false, message:"Invalid OTP"});
+        }
+        
+    } catch (err) {
+        return res.statuscode(500).send({success :false, message:"Server error"});
+    }
+
+}
+
 module.exports = { 
     userRegister,
     verifyOtp,
     getUserDetails,
     userLogin,
-    forgotPassword
+    forgotPassword,
+    verifyForgotPasswordOTP
  };
