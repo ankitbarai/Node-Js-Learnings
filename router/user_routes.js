@@ -6,6 +6,7 @@ const appRouter = express.Router();
 //authentication
 appRouter.post('/user-registration',userController.userRegister);
 appRouter.post('/verify-otp',userController.verifyOtp);
+appRouter.post('/user-login',userController.userLogin);
 
 //users
 

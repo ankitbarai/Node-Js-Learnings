@@ -65,7 +65,6 @@ const verifyOtp = async (req,res)=>{
             let userData = user.toObject();
             userData['token'] = token;
 
-
             return res.statuscode(201).send({success :true, message:"Registered Successfully", data:userData});
         }else{
             return res.statuscode(500).send({success :false, message:"Invalid OTP"});
@@ -88,6 +87,37 @@ const getUserDetails = async(req,res)=>{
     }    
 }
 
+//user Login
+const userLogin = async(req,res)=>{
+        const { email, password } = req.body;
+    try {
+         if (!(email && password)) {
+            return res.statuscode(400).send({ success: false, message: "email and password are required" });
+        }
+        const user = await userModel.findOne({email:email});
+
+        if (!user) {
+            return res.statuscode(400).send({ success: false, message: "Invalid Email" });
+        }
+
+        if (!(await user.comparePassword(password,user.password))) {
+            return res.statuscode(400).send({ success: false, message: "Invalid Passwordl" });
+        }
+
+            let token = generateToken(user.id, user.email);
+            let userData = user.toObject();
+            userData['token'] = token;
+            return res.statuscode(201).send({success :true, message:"User Logged in Successfully", data:userData});
+
+    } catch (err) {
+        return res.status(500).send({success:false, message:"Server error"});
+    }    
+}
 
 
-module.exports = { userRegister,verifyOtp,getUserDetails };
+
+module.exports = { 
+    userRegister,
+    verifyOtp,
+    getUserDetails,
+    userLogin };
