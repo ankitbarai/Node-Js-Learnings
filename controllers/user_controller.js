@@ -3,6 +3,7 @@ const userModel = require('../models/user_models');
 const verifyOtpModel = require('../models/verify_otp_model');
 const forgotPasswordOtpModel = require('../models/forgot_password_model');
 const {generateToken} = require('../middleware/authentication');
+const hashPassword = require('../utils/hash_password');
 
 
 // user registration
@@ -179,11 +180,37 @@ const verifyForgotPasswordOTP = async (req,res)=>{
 
 }
 
+//Reset Password
+const resetPassword = async (req,res)=>{
+    const { email,password } = req.body;
+
+    try {
+
+         if (!(email && password)) {
+            return res.statuscode(400).send({ success: false, message: "email and otp are required" });
+        }
+
+        let user = await userModel.find({email});
+        
+        if ((await user.comparePassword(password,user.password))) {
+            return res.statuscode(400).send({ success: false, message: "Your new password must be different than previous one" });
+        }else{
+            user.password = await hashPassword(password);
+            await user.save();
+            return res.statuscode(200).send({ success: true, message: "password changed successfully"});
+        }
+    } catch (err) {
+        return res.statuscode(500).send({success :false, message:"Server error"});
+    }
+
+}
+
 module.exports = { 
     userRegister,
     verifyOtp,
     getUserDetails,
     userLogin,
     forgotPassword,
-    verifyForgotPasswordOTP
+    verifyForgotPasswordOTP,
+    resetPassword
  };

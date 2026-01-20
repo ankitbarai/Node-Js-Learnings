@@ -9,6 +9,7 @@ appRouter.post('/verify-otp',userController.verifyOtp);
 appRouter.post('/user-login',userController.userLogin);
 appRouter.post('/forgot-password',userController.forgotPassword);
 appRouter.post('/verify-forgot-password-otp',userController.verifyForgotPasswordOTP);
+appRouter.post('/reset-password',userController.resetPassword);
 
 //users
 
